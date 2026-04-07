@@ -12,6 +12,7 @@ let rec natmul a b =
   | (S b') -> natadd a (natmul a b')
 ;;
 
+(* Example *)
 let two = S (S O) ;;
 let three = S (S (S O)) ;;
 
