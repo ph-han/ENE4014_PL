@@ -4,7 +4,7 @@ let rec is_even a =
   match a with
     O -> true
   | S O -> false
-  | S (S b') -> is_even b'
+  | S (S a') -> is_even a'
 ;;
 
 let rec leq a b =
