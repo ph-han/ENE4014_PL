@@ -37,3 +37,9 @@ let is_squared a =
 (* Example *)
 let two = S (S O) ;;
 let three = S (S (S O)) ;;
+
+is_squared two ;;
+let nine = natmul three three ;;
+is_squared nine ;;
+let four = natmul two two ;;
+is_squared four ;;
