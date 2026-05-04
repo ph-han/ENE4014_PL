@@ -14,26 +14,34 @@ let rec diff (exp, var) =
       if x = var then CONST 1
       else CONST 0
   | POWER (x, n) ->
-    if x <> var then CONST 0
-    else if n = 0 then CONST 0
-    else if n = 1 then CONST 1
-    else TIMES [CONST n; POWER (x, n - 1)]
+      if x <> var then CONST 0
+      else if n = 2 then TIMES [CONST n; VAR var]
+      else TIMES [CONST n; POWER (x, n - 1)]
   | SUM e ->
-      SUM (diff_sum e var)
+      if e = [] then CONST 0
+      else SUM (diff_sum e var)
   | TIMES e ->
-      SUM (diff_times e var)
+      if e = [] then CONST 0
+      else let cst = ref 0 in diff_times e var cst
 and diff_sum e var =
   match e with
   | [] -> []
-  | hd :: tl -> diff (hd, var) :: diff_sum tl var
-and diff_times e var =
+  | hd :: tl -> 
+    let res = diff (hd, var) in
+    if res = CONST 0 then
+      diff_sum tl var
+    else
+      res :: diff_sum tl var
+and diff_times e var cst =
   match e with
-  | [] -> []
+  | [] -> CONST 0
   | hd :: tl ->
-      TIMES (diff (hd, var) :: tl) :: add_front hd (diff_times tl var)
-and add_front first e =
-  match e with
-  | [] -> []
-  | TIMES li :: tl -> TIMES (first :: li) :: add_front first tl
-  | hd :: tl -> TIMES [first; hd] :: add_front first tl
+      match hd with
+        CONST n -> cst := n; diff_times tl var cst
+      | VAR x -> if x = var then CONST (!cst) else CONST 0
+      | POWER (x, n) ->
+        if x <> var then CONST 0
+        else if n = 2 then TIMES [CONST (!cst * n); VAR var]
+        else TIMES [CONST (!cst * n); POWER (x, n - 1)] 
+      | _ -> diff_times tl var cst 
 ;;
